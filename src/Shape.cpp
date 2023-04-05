@@ -81,7 +81,7 @@ void Shape::loadMesh(const string &meshName)
 		vmax.z = max(vmax.z, v.z);
 	}
 	minY = vmin.y;
-	//std::cout << vmin.y << std::endl;
+	std::cout << "Mesh name: " << meshName << ", Min y value: " << vmin.y << std::endl;
 }
 
 void Shape::fitToUnitBox()
