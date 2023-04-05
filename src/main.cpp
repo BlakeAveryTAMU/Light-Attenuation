@@ -61,7 +61,7 @@ Material currMaterial;
 int matIndex = 0;
 
 vector<Light> lights;
-Light* currLight;
+Light currLight;
 int lightIndex = 0;
 
 vector<Object*> objects;
@@ -114,9 +114,9 @@ static void cursor_position_callback(GLFWwindow* window, double xmouse, double y
 
 static void char_callback(GLFWwindow *window, unsigned int key)
 {
-	/*switch (key) {
+	switch (key) {
 
-		case 'w':
+		/*case 'w':
 			freeCam->keyPressed(key);
 			break;
 		case 'a':
@@ -136,9 +136,13 @@ static void char_callback(GLFWwindow *window, unsigned int key)
 			break;
 		case 't':
 			activated += 1;
-			break;
+			break;*/
+
+	case 'l':
+		currLight = lights[++lightIndex];
+		break;
 	
-	}*/
+	}
 
 }
 
@@ -196,6 +200,7 @@ static void init()
 	prog2->addUniform("lightPos1");
 	prog2->addUniform("lightColor1");
 	prog2->addUniform("ka");
+	prog2->addUniform("ke");
 	prog2->addUniform("kd");
 	prog2->addUniform("ks");
 	prog2->addUniform("s");
@@ -226,18 +231,69 @@ static void init()
 	m3.setShiny(2.0f);
 	materials.push_back(m3);
 
+	Light l0;
+	l0.setPosition({ 4.0f, 1.0f, -4.0f });
+	l0.setColor({ 1.0f, 0.0f, 0.0f }); //red
+	lights.push_back(l0);
+
 	Light l1;
-	l1.setPosition({ 4.0f, 2.0f, -4.0f });
-	l1.setColor({ 1.0f, 1.0f, 1.0f });
+	l1.setPosition({ 4.0f, 1.0f, -3.0f });
+	l1.setColor({ 0.0f, 1.0f, 0.0f }); // green
 	lights.push_back(l1);
 
+	Light l2;
+	l2.setPosition({ 4.0f, 1.0f, -2.0f });
+	l2.setColor({ 0.0f, 0.0f, 1.0f }); // blue
+	lights.push_back(l2);
+
+	Light l3;
+	l3.setPosition({ 3.0f, 1.0f, -2.0f });
+	l3.setColor({ 0.0f, 1.0f, 1.0f }); // light blue
+	lights.push_back(l3);
+
+	Light l4;
+	l4.setPosition({ 3.0f, 1.0f, -3.0f });
+	l4.setColor({ 1.0f, 0.0f, 1.0f }); // pink
+	lights.push_back(l4);
+
+	Light l5;
+	l5.setPosition({ 3.0f, 1.0f, -4.0f });
+	l5.setColor({ 1.0f, 1.0f, 0.0f }); // yellow
+	lights.push_back(l5);
+
+	Light l6;
+	l6.setPosition({ 2.0f, 1.0f, -4.0f });
+	l6.setColor({ 1.0f, 0.5f, 0.0f }); // orange
+	lights.push_back(l6);
+
+
+	Light l7;
+	l7.setPosition({ 2.0f, 1.0f, -3.0f });
+	l7.setColor({ 0.5f, 0.0f, 1.0f }); // purple
+	lights.push_back(l7);
+
+	Light l8;
+	l8.setPosition({ 2.0f, 1.0f, -2.0f });
+	l8.setColor({ 0.0f, 1.0f, 0.5f }); // cyan green
+	lights.push_back(l8);
+
+	Light l9;
+	l9.setPosition({ 3.0f, 1.0f, -2.0f });
+	l9.setColor({ 0.5f, 1.0f, 0.0f }); // yellow-green
+	lights.push_back(l9);
+
+	glm::vec3 light_positions[10] = { l0.getPosition(), l1.getPosition(), l2.getPosition(), l3.getPosition(),
+										l4.getPosition(), l5.getPosition(), l6.getPosition(), l7.getPosition(), l8.getPosition(), l9.getPosition() };
+
+	glm::vec3 light_colors[10] = { l0.getColor(), l1.getColor(), l2.getColor(), l3.getColor(), l4.getColor(),
+									l5.getColor(), l6.getColor(), l7.getColor(), l8.getColor(), l9.getColor() };
 
 	//set default program
 	currProgram = programs[0];
 	//set the default material
 	currMaterial = materials[0];
 	//set the default light
-	currLight = &lights[0];
+	currLight = lights[0];
 
 	camera = make_shared<Camera>();
 	camera->setInitDistance(3.0f); // Camera's initial Z translation
@@ -274,8 +330,7 @@ static void init()
 			if (j % 2 == 0) {
 				obj->setShape(bunny); // bunny
 				obj->setTranslation(glm::vec3(j, obj->getScale()[1] * -0.333099, -i));
-				//cout << obj->getTranslation()[0] << ", " << obj->getTranslation()[1] << ", " << obj->getTranslation()[2] << endl;
-				//obj->setScale(glm::vec3(0.2, 0.2, 0.2));
+				
 
 			}
 			else {
@@ -337,24 +392,24 @@ static void render()
 	//freeCam->applyViewMatrix(MV);
 	camera->applyViewMatrix(MV);
 	
-	//Draw Sun --------------------------------------------------------------------------------------
-	glm::vec3 temp = MV->topMatrix() * glm::vec4(lights[0].getPosition(), 1);
+	//Draw Lights --------------------------------------------------------------------------------------
+	glm::vec3 temp = MV->topMatrix() * glm::vec4(currLight.getPosition(), 1); // change to lights[currLight].getPosition ? 
 
 	MV->pushMatrix();
 	{
-		MV->translate(lights[0].getPosition());
+		MV->translate(currLight.getPosition());
 		MV->scale(0.2, 0.2, 0.2);
 
 		prog2->bind();
 		glUniform3f(prog2->getUniform("lightPos1"), temp[0], temp[1], temp[2]);
-		glUniform3f(prog2->getUniform("lightColor1"), lights[0].getColor()[0], lights[0].getColor()[1], lights[0].getColor()[2]);
+		glUniform3f(prog2->getUniform("lightColor1"), currLight.getColor()[0], currLight.getColor()[1], currLight.getColor()[2]);
 		glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 		glUniformMatrix4fv(prog2->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
 		glUniformMatrix4fv(prog2->getUniform("MVit"), 1, GL_FALSE, glm::value_ptr(transpose(inverse(MV->topMatrix()))));
-		glUniform3f(prog2->getUniform("ka"), 1.0f, 1.0, 0);
-		glUniform3f(prog2->getUniform("kd"), 0, 0, 0);
-		glUniform3f(prog2->getUniform("ks"), 0, 0, 0);
-		glUniform1f(prog2->getUniform("s"), currMaterial.getShiny());
+		glUniform3f(prog2->getUniform("ke"), 0.2, 0.2, 0.2);
+		glUniform3f(prog2->getUniform("kd"), currLight.getColor()[0], currLight.getColor()[0], currLight.getColor()[0]);
+		glUniform3f(prog2->getUniform("ks"), 1, 1, 1);
+		glUniform1f(prog2->getUniform("s"), 10);
 		sun->draw(prog2);
 		prog2->unbind();
 
@@ -378,7 +433,7 @@ static void render()
 		glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 		glUniformMatrix4fv(prog2->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
 		glUniformMatrix4fv(prog2->getUniform("MVit"), 1, GL_FALSE, glm::value_ptr(transpose(inverse(MV->topMatrix()))));
-		glUniform3f(prog2->getUniform("ka"), 0.2f, 0.2, 0.2);
+		glUniform3f(prog2->getUniform("ke"), 0.2f, 0.2, 0.2);
 		glUniform3f(prog2->getUniform("kd"), 0.8f, 0.0f, 0.0f);
 		glUniform3f(prog2->getUniform("ks"), 1, 0.9, 0.8);
 		glUniform1f(prog2->getUniform("s"), currMaterial.getShiny());
@@ -405,10 +460,10 @@ static void render()
 			glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 			glUniformMatrix4fv(prog2->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
 			glUniformMatrix4fv(prog2->getUniform("MVit"), 1, GL_FALSE, glm::value_ptr(transpose(inverse(MV->topMatrix()))));
-			glUniform3f(prog2->getUniform("ka"), currMaterial.getAmbient()[0], currMaterial.getAmbient()[1], currMaterial.getAmbient()[2]);
-			glUniform3f(prog2->getUniform("kd"), currObject->getColor()[0], currObject->getColor()[1], currObject->getColor()[2]);
-			glUniform3f(prog2->getUniform("ks"), currMaterial.getSpecular()[0], currMaterial.getSpecular()[1], currMaterial.getSpecular()[2]);
-			glUniform1f(prog2->getUniform("s"), currMaterial.getShiny());
+			glUniform3f(prog2->getUniform("ke"), currObject->getEmissive()[0], currObject->getEmissive()[0], currObject->getEmissive()[0]);
+			glUniform3f(prog2->getUniform("kd"), currObject->getDiffuse()[0], currObject->getDiffuse()[1], currObject->getDiffuse()[2]);
+			glUniform3f(prog2->getUniform("ks"), 1, 1, 1);
+			glUniform1f(prog2->getUniform("s"), 10);
 			currObject->getShape()->draw(prog2);
 			prog2->unbind();
 		}

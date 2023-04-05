@@ -3,6 +3,7 @@
 uniform vec3 lightColor1;
 uniform vec3 lightPos1;
 uniform vec3 ka;
+uniform vec3 ke;
 uniform vec3 kd;
 uniform vec3 ks;
 uniform float s;
@@ -28,10 +29,12 @@ void main()
 	vec3 cd1 = kd * lambertian1;
 	vec3 cs1 = ks * specular1;
 
+	cd1 = vec3(cd1[0] * lightColor1[0], cd1[1] * lightColor1[1], cd1[2] * lightColor1[2]);
+	cs1 = vec3(cs1[0] * lightColor1[0], cs1[1] * lightColor1[1], cs1[2] * lightColor1[2]);
 
-	vec3 color1 = lightColor1 * (ka + cd1 + cs1);
+	vec3 color = ke + cd1 + cs1;
 	
-	gl_FragColor = vec4(color1, 1.0);
+	gl_FragColor = vec4(color, 1.0);
 	
 	
 }

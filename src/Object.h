@@ -18,7 +18,8 @@ private:
 	glm::vec3 translation;
 	glm::vec3 scale;
 	glm::vec3 rotation;
-	glm::vec3 color;
+	glm::vec3 diffuse;
+	glm::vec3 emissive;
 
 public:
 
@@ -29,7 +30,8 @@ public:
 		translation = glm::vec3(0, 0, 0);
 		scale = glm::vec3(random_scale_factor, random_scale_factor, random_scale_factor);
 		rotation = glm::vec3(0, 0, 0);
-		color = glm::vec3((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX));
+		diffuse = glm::vec3((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX));
+		emissive = glm::vec3(0, 0, 0);
 	}
 
 	void setShape(std::shared_ptr<Shape> s) {shape = s;}
@@ -44,7 +46,9 @@ public:
 	void setRotation(glm::vec3 r) { rotation = r; }
 	glm::vec3 getRotatoin() { return rotation; }
 
-	glm::vec3 getColor() { return color; }
+	glm::vec3 getDiffuse() { return diffuse; }
+	
+	glm::vec3 getEmissive() { return emissive; }
 
 
 };
