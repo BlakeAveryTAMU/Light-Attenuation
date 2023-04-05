@@ -177,7 +177,7 @@ static void init()
 	glfwSetTime(0.0);
 	
 	// Set background color.
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	// Enable z-buffer test.
 	glEnable(GL_DEPTH_TEST);
 
@@ -227,7 +227,7 @@ static void init()
 	materials.push_back(m3);
 
 	Light l1;
-	l1.setPosition({ 5.0f, 2.0f, 3.0f });
+	l1.setPosition({ 4.0f, 2.0f, -4.0f });
 	l1.setColor({ 1.0f, 1.0f, 1.0f });
 	lights.push_back(l1);
 
@@ -240,7 +240,7 @@ static void init()
 	currLight = &lights[0];
 
 	camera = make_shared<Camera>();
-	camera->setInitDistance(2.0f); // Camera's initial Z translation
+	camera->setInitDistance(3.0f); // Camera's initial Z translation
 
 	freeCam = make_shared<FreeLookCamera>();
 	freeCam->setInitDistance(2.0f);
@@ -273,13 +273,13 @@ static void init()
 			Object* obj = new Object();
 			if (j % 2 == 0) {
 				obj->setShape(bunny); // bunny
-				obj->setTranslation(glm::vec3(j, -0.066618, i));
+				obj->setTranslation(glm::vec3(j, -0.066618, -i));
 				//obj->setScale(glm::vec3(0.2, 0.2, 0.2));
 
 			}
 			else {
 				obj->setShape(teapot); // teapot
-				obj->setTranslation(glm::vec3(j, 0, i));
+				obj->setTranslation(glm::vec3(j, 0, -i));
 				//obj->setScale(glm::vec3(0.2, 0.2, 0.2));
 			}
 
@@ -372,7 +372,7 @@ static void render()
 	MV->pushMatrix();
 	{
 
-		MV->translate(4, 0, 4);
+		MV->translate(4, 0, -4);
 		MV->scale(15, 1, 15);
 		MV->rotate(-1 * M_PI / 2, { 1, 0, 0 });
 
