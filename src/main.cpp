@@ -273,7 +273,8 @@ static void init()
 			Object* obj = new Object();
 			if (j % 2 == 0) {
 				obj->setShape(bunny); // bunny
-				obj->setTranslation(glm::vec3(j, -0.066618, -i));
+				obj->setTranslation(glm::vec3(j, obj->getScale()[1] * -0.333099, -i));
+				//cout << obj->getTranslation()[0] << ", " << obj->getTranslation()[1] << ", " << obj->getTranslation()[2] << endl;
 				//obj->setScale(glm::vec3(0.2, 0.2, 0.2));
 
 			}
@@ -288,11 +289,7 @@ static void init()
 	}
 	currObject = objects[0];
 
-	Object* last_bunny = new Object();
-	last_bunny->setShape(bunny);
-	last_bunny->setTranslation(glm::vec3(1, -0.066618, -3));
-	last_bunny->setScale(glm::vec3(0.2, 0.2, 0.2));
-	objects.push_back(last_bunny);
+	
 	
 	GLSL::checkError(GET_FILE_LINE);
 }
@@ -401,6 +398,8 @@ static void render()
 		{
 			MV->translate(currObject->getTranslation());
 			MV->scale(currObject->getScale());
+			
+			
 
 			prog2->bind();
 			glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
