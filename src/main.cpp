@@ -328,15 +328,16 @@ static void init()
 
 			Object* obj = new Object();
 			if (j % 2 == 0) {
+				obj->setShapeType("bunny");
 				obj->setShape(bunny); // bunny
 				obj->setTranslation(glm::vec3(j, obj->getScale()[1] * -0.333099, -i));
 				
-
 			}
 			else {
+				obj->setShapeType("teapot");
 				obj->setShape(teapot); // teapot
 				obj->setTranslation(glm::vec3(j, 0, -i));
-				//obj->setScale(glm::vec3(0.2, 0.2, 0.2));
+				
 			}
 
 			objects.push_back(obj);
@@ -418,7 +419,7 @@ static void render()
 	// ---------------------------------------------------------------------------------------------------
 
 	glm::mat4 S(1.0f);
-	S[0][1] = 0.5f * cos(t);
+	S[1][2] = 0.5f * cos(t * 2);
 
 	//Draw Ground
 	MV->pushMatrix();
@@ -453,7 +454,15 @@ static void render()
 		{
 			MV->translate(currObject->getTranslation());
 			MV->scale(currObject->getScale());
-			
+
+			if (currObject->getShapeType() == "bunny") {
+				MV->rotate(t, { 0, 1, 0 });
+			}
+			if (currObject->getShapeType() == "teapot") {
+
+				//shear
+				MV->multMatrix(S);
+			}
 			
 
 			prog2->bind();

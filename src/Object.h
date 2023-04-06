@@ -8,12 +8,14 @@
 
 #include <memory>
 #include <iostream>
+#include <string>
 #include <random>
 
 class Object {
 
 private:
 
+	std::string shape_type;
 	std::shared_ptr<Shape> shape;
 	glm::vec3 translation;
 	glm::vec3 scale;
@@ -26,6 +28,7 @@ public:
 	float random_scale_factor = (float)(rand()) / (float)(RAND_MAX) / 2 + 0.1f;
 
 	Object() {
+		shape_type = "";
 		shape = nullptr;
 		translation = glm::vec3(0, 0, 0);
 		scale = glm::vec3(random_scale_factor, random_scale_factor, random_scale_factor);
@@ -49,6 +52,9 @@ public:
 	glm::vec3 getDiffuse() { return diffuse; }
 	
 	glm::vec3 getEmissive() { return emissive; }
+
+	std::string getShapeType() { return shape_type; }
+	void setShapeType(std::string s) { shape_type = s; }
 
 
 };
