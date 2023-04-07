@@ -9,24 +9,24 @@ class Light {
 private:
 
 	glm::vec3 position;
-	glm::vec3 color;
+	glm::vec3 diffuse;
 
 public:
 
 	Light() {
 		position = glm::vec3();
-		color = glm::vec3();
+		diffuse = glm::vec3();
 	}
 
 	void setPosition(glm::vec3 p) {
 		position = p;
 	}
-	void setColor(glm::vec3 c) {
-		color = c;
+	void setDiffuse(glm::vec3 d) {
+		diffuse = d;
 	}
 
 	glm::vec3 getPosition() { return position; }
-	glm::vec3 getColor() { return color; }
+	glm::vec3 getDiffuse() { return diffuse; }
 
 	void translatePosition_X(float t) {
 		position[0] += t;

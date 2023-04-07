@@ -64,6 +64,9 @@ vector<Light> lights;
 Light currLight;
 int lightIndex = 0;
 
+glm::vec3 light_positions[10];
+glm::vec3 light_diffuse_colors[10];
+
 vector<Object*> objects;
 Object* currObject;
 
@@ -197,8 +200,8 @@ static void init()
 	prog2->addAttribute("aNor");
 	prog2->addUniform("MV");
 	prog2->addUniform("P");
-	prog2->addUniform("lightPos1");
-	prog2->addUniform("lightColor1");
+	prog2->addUniform("lightPositions");
+	prog2->addUniform("lightDiffuseColors");
 	prog2->addUniform("ka");
 	prog2->addUniform("ke");
 	prog2->addUniform("kd");
@@ -233,60 +236,60 @@ static void init()
 
 	Light l0;
 	l0.setPosition({ 4.0f, 1.0f, -4.0f });
-	l0.setColor({ 1.0f, 0.0f, 0.0f }); //red
+	l0.setDiffuse({ 1.0f, 0.0f, 0.0f }); //red
 	lights.push_back(l0);
 
 	Light l1;
 	l1.setPosition({ 4.0f, 1.0f, -3.0f });
-	l1.setColor({ 0.0f, 1.0f, 0.0f }); // green
+	l1.setDiffuse({ 0.0f, 1.0f, 0.0f }); // green
 	lights.push_back(l1);
 
 	Light l2;
 	l2.setPosition({ 4.0f, 1.0f, -2.0f });
-	l2.setColor({ 0.0f, 0.0f, 1.0f }); // blue
+	l2.setDiffuse({ 0.0f, 0.0f, 1.0f }); // blue
 	lights.push_back(l2);
 
 	Light l3;
 	l3.setPosition({ 3.0f, 1.0f, -2.0f });
-	l3.setColor({ 0.0f, 1.0f, 1.0f }); // light blue
+	l3.setDiffuse({ 0.0f, 1.0f, 1.0f }); // light blue
 	lights.push_back(l3);
 
 	Light l4;
 	l4.setPosition({ 3.0f, 1.0f, -3.0f });
-	l4.setColor({ 1.0f, 0.0f, 1.0f }); // pink
+	l4.setDiffuse({ 1.0f, 0.0f, 1.0f }); // pink
 	lights.push_back(l4);
 
 	Light l5;
 	l5.setPosition({ 3.0f, 1.0f, -4.0f });
-	l5.setColor({ 1.0f, 1.0f, 0.0f }); // yellow
+	l5.setDiffuse({ 1.0f, 1.0f, 0.0f }); // yellow
 	lights.push_back(l5);
 
 	Light l6;
 	l6.setPosition({ 2.0f, 1.0f, -4.0f });
-	l6.setColor({ 1.0f, 0.5f, 0.0f }); // orange
+	l6.setDiffuse({ 1.0f, 0.5f, 0.0f }); // orange
 	lights.push_back(l6);
 
 
 	Light l7;
 	l7.setPosition({ 2.0f, 1.0f, -3.0f });
-	l7.setColor({ 0.5f, 0.0f, 1.0f }); // purple
+	l7.setDiffuse({ 0.5f, 0.0f, 1.0f }); // purple
 	lights.push_back(l7);
 
 	Light l8;
 	l8.setPosition({ 2.0f, 1.0f, -2.0f });
-	l8.setColor({ 0.0f, 1.0f, 0.5f }); // cyan green
+	l8.setDiffuse({ 0.0f, 1.0f, 0.5f }); // cyan green
 	lights.push_back(l8);
 
 	Light l9;
 	l9.setPosition({ 3.0f, 1.0f, -2.0f });
-	l9.setColor({ 0.5f, 1.0f, 0.0f }); // yellow-green
+	l9.setDiffuse({ 0.5f, 1.0f, 0.0f }); // yellow-green
 	lights.push_back(l9);
 
-	glm::vec3 light_positions[10] = { l0.getPosition(), l1.getPosition(), l2.getPosition(), l3.getPosition(),
-										l4.getPosition(), l5.getPosition(), l6.getPosition(), l7.getPosition(), l8.getPosition(), l9.getPosition() };
+	for (int i = 0; i < 10; i++) {
+		light_positions[i] = lights[i].getPosition();
+		light_diffuse_colors[i] = lights[i].getDiffuse();
+	}
 
-	glm::vec3 light_colors[10] = { l0.getColor(), l1.getColor(), l2.getColor(), l3.getColor(), l4.getColor(),
-									l5.getColor(), l6.getColor(), l7.getColor(), l8.getColor(), l9.getColor() };
 
 	//set default program
 	currProgram = programs[0];
@@ -393,8 +396,13 @@ static void render()
 	//freeCam->applyViewMatrix(MV);
 	camera->applyViewMatrix(MV);
 	
-	//Draw Lights --------------------------------------------------------------------------------------
-	glm::vec3 temp = MV->topMatrix() * glm::vec4(currLight.getPosition(), 1); // change to lights[currLight].getPosition ? 
+		//Draw Lights --------------------------------------------------------------------------------------
+	for (int i = 0; i < 10; i++) {
+
+		//glm::vec3 temp = MV->topMatrix() * glm::vec4(currLight.getPosition(), 1); // change to lights[currLight].getPosition ? 
+		light_positions[i] = glm::vec3(MV->topMatrix() * glm::vec4(light_positions[i], 1));
+
+	}
 
 	MV->pushMatrix();
 	{
@@ -402,13 +410,14 @@ static void render()
 		MV->scale(0.2, 0.2, 0.2);
 
 		prog2->bind();
-		glUniform3f(prog2->getUniform("lightPos1"), temp[0], temp[1], temp[2]);
-		glUniform3f(prog2->getUniform("lightColor1"), currLight.getColor()[0], currLight.getColor()[1], currLight.getColor()[2]);
+		glUniform3fv(prog2->getUniform("lightPositions"), 10, glm::value_ptr(light_positions[0]));
+		//glUniform3f(prog2->getUniform("lightPos1"), temp[0], temp[1], temp[2]);
+		glUniform3fv(prog2->getUniform("lightDiffuseColors"), 10, glm::value_ptr(light_diffuse_colors[0]));
 		glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 		glUniformMatrix4fv(prog2->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
 		glUniformMatrix4fv(prog2->getUniform("MVit"), 1, GL_FALSE, glm::value_ptr(transpose(inverse(MV->topMatrix()))));
 		glUniform3f(prog2->getUniform("ke"), 0.2, 0.2, 0.2);
-		glUniform3f(prog2->getUniform("kd"), currLight.getColor()[0], currLight.getColor()[0], currLight.getColor()[0]);
+		glUniform3f(prog2->getUniform("kd"), currLight.getDiffuse()[0], currLight.getDiffuse()[0], currLight.getDiffuse()[0]);
 		glUniform3f(prog2->getUniform("ks"), 1, 1, 1);
 		glUniform1f(prog2->getUniform("s"), 10);
 		sun->draw(prog2);
@@ -417,6 +426,7 @@ static void render()
 	}
 	MV->popMatrix();
 	// ---------------------------------------------------------------------------------------------------
+	
 
 	glm::mat4 S(1.0f);
 	S[1][2] = 0.5f * cos(t * 2);

@@ -1,7 +1,7 @@
 #version 120
 
-uniform vec3 lightColor1;
-uniform vec3 lightPos1;
+uniform vec3 lightDiffuseColors[10];
+uniform vec3 lightPositions[10];
 uniform vec3 ka;
 uniform vec3 ke;
 uniform vec3 kd;
