@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <random>
 
 class Light {
 
@@ -35,6 +36,7 @@ public:
 	void translatePosition_Y(float t) {
 		position[1] += t;
 	}
+
 
 };
 
