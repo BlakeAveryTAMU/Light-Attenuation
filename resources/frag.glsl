@@ -16,25 +16,29 @@ varying vec3 vNor; // camera space normal
 void main()
 {
 
-	//cd1: 
-	vec3 lightDir1 = lightPos1 - vPos;
-	lightDir1 = normalize(lightDir1);
-	float lambertian1 = max(0.0, dot(lightDir1, normalize(vNor)));
+	vec3 fragColor = ke;
 
-	//cs1:
-	vec3 eyeVector = normalize(-1 * vPos);
-	vec3 halfDir1 = normalize(lightDir1 + eyeVector);
-	float specular1 = pow(max(0.0, dot(halfDir1, normalize(vNor))), s);
-
-	vec3 cd1 = kd * lambertian1;
-	vec3 cs1 = ks * specular1;
-
-	cd1 = vec3(cd1[0] * lightColor1[0], cd1[1] * lightColor1[1], cd1[2] * lightColor1[2]);
-	cs1 = vec3(cs1[0] * lightColor1[0], cs1[1] * lightColor1[1], cs1[2] * lightColor1[2]);
-
-	vec3 color = ke + cd1 + cs1;
+	for (int i = 0; i < 10; i++){
 	
-	gl_FragColor = vec4(color, 1.0);
-	
+		vec3 lightDir = lightPositions[i] - vPos;
+		lightDir = normalize(lightDir);
+		float lambertian = max(0.0, dot(lightDir, normalize(vNor)));
+		vec3 diffuse_color = kd * lambertian;
+
+		vec3 eyeVector = normalize(-1 * vPos);
+		vec3 halfDir = normalize(lightDir + eyeVector);
+		float specular = pow(max(0.0, dot(halfDir, normalize(vNor))), s);
+		vec3 specular_color = ks * specular;
+
+		vec3 color = lightDiffuseColors[i] * (diffuse_color + specular_color);
+
+		float r = distance(lightPositions[i], vPos);
+
+		float attenuation = 1.0 / (1.0 + 0.0429 * r + 0.9857 * pow(r, 2));
+
+		fragColor += color * attenuation;
+	}
+
+	gl_FragColor = vec4(fragColor, 1.0);
 	
 }

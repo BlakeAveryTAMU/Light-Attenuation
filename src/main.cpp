@@ -397,34 +397,59 @@ static void render()
 	camera->applyViewMatrix(MV);
 	
 		//Draw Lights --------------------------------------------------------------------------------------
+	glm::vec3 temp_light_positions[10];
 	for (int i = 0; i < 10; i++) {
 
 		//glm::vec3 temp = MV->topMatrix() * glm::vec4(currLight.getPosition(), 1); // change to lights[currLight].getPosition ? 
-		light_positions[i] = glm::vec3(MV->topMatrix() * glm::vec4(light_positions[i], 1));
+		temp_light_positions[i] = glm::vec3(MV->topMatrix() * glm::vec4(light_positions[i], 1));
 
 	}
 
-	MV->pushMatrix();
-	{
-		MV->translate(currLight.getPosition());
-		MV->scale(0.2, 0.2, 0.2);
+	prog2->bind();
+	glUniform3fv(prog2->getUniform("lightPositions"), 10, glm::value_ptr(temp_light_positions[0]));
+	glUniform3fv(prog2->getUniform("lightDiffuseColors"), 10, glm::value_ptr(light_diffuse_colors[0]));
+	glUniform3f(prog2->getUniform("ke"), 0.2, 0.2, 0.2);
+	glUniform3f(prog2->getUniform("ks"), 1, 1, 1);
+	glUniform1f(prog2->getUniform("s"), 10);
 
-		prog2->bind();
-		glUniform3fv(prog2->getUniform("lightPositions"), 10, glm::value_ptr(light_positions[0]));
-		//glUniform3f(prog2->getUniform("lightPos1"), temp[0], temp[1], temp[2]);
-		glUniform3fv(prog2->getUniform("lightDiffuseColors"), 10, glm::value_ptr(light_diffuse_colors[0]));
-		glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
-		glUniformMatrix4fv(prog2->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
-		glUniformMatrix4fv(prog2->getUniform("MVit"), 1, GL_FALSE, glm::value_ptr(transpose(inverse(MV->topMatrix()))));
-		glUniform3f(prog2->getUniform("ke"), 0.2, 0.2, 0.2);
-		glUniform3f(prog2->getUniform("kd"), currLight.getDiffuse()[0], currLight.getDiffuse()[0], currLight.getDiffuse()[0]);
-		glUniform3f(prog2->getUniform("ks"), 1, 1, 1);
-		glUniform1f(prog2->getUniform("s"), 10);
-		sun->draw(prog2);
-		prog2->unbind();
+	for (int i = 0; i < 10; i++) {
 
+		MV->pushMatrix();
+		{
+			MV->translate(light_positions[i]);
+			MV->scale(0.2, 0.2, 0.2);
+			glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
+			glUniformMatrix4fv(prog2->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
+			glUniformMatrix4fv(prog2->getUniform("MVit"), 1, GL_FALSE, glm::value_ptr(transpose(inverse(MV->topMatrix()))));
+			glUniform3f(prog2->getUniform("kd"), light_diffuse_colors[i][0], light_diffuse_colors[i][1], light_diffuse_colors[i][2]);
+			sun->draw(prog2);
+			
+		}
+		MV->popMatrix();
 	}
-	MV->popMatrix();
+	prog2->unbind();
+
+	//MV->pushMatrix();
+	//{
+	//	MV->translate();
+	//	MV->scale(0.2, 0.2, 0.2);
+
+	//	prog2->bind();
+	//	glUniform3fv(prog2->getUniform("lightPositions"), 10, glm::value_ptr(temp_light_positions[0]));
+	//	//glUniform3f(prog2->getUniform("lightPos1"), temp[0], temp[1], temp[2]);
+	//	glUniform3fv(prog2->getUniform("lightDiffuseColors"), 10, glm::value_ptr(light_diffuse_colors[0]));
+	//	glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
+	//	glUniformMatrix4fv(prog2->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
+	//	glUniformMatrix4fv(prog2->getUniform("MVit"), 1, GL_FALSE, glm::value_ptr(transpose(inverse(MV->topMatrix()))));
+	//	glUniform3f(prog2->getUniform("ke"), 0.2, 0.2, 0.2);
+	//	glUniform3f(prog2->getUniform("kd"), currLight.getDiffuse()[0], currLight.getDiffuse()[0], currLight.getDiffuse()[0]);
+	//	glUniform3f(prog2->getUniform("ks"), 1, 1, 1);
+	//	glUniform1f(prog2->getUniform("s"), 10);
+	//	sun->draw(prog2);
+	//	prog2->unbind();
+
+	//}
+	//MV->popMatrix();
 	// ---------------------------------------------------------------------------------------------------
 	
 
