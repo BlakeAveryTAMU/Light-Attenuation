@@ -25,6 +25,7 @@
 #include "Object.h"
 #include "FreeLookCamera.h"
 #include "Texture.h"
+#include "MyShape.h"
 #include <random>
 
 using namespace std;
@@ -45,6 +46,7 @@ shared_ptr<Shape> teapot;
 shared_ptr<Shape> plane;
 shared_ptr<Shape> sun;
 shared_ptr<Shape> frustum;
+shared_ptr<MyShape> sphere;
 
 float minYTeapot;
 float minYBunny;
@@ -69,6 +71,9 @@ glm::vec3 light_diffuse_colors[10];
 
 vector<Object*> objects;
 Object* currObject;
+
+map<string, GLuint> bufIDs;
+int indCount;
 
 bool keyToggles[256] = {false}; // only for English keyboards!
 
@@ -328,23 +333,44 @@ static void init()
 	frustum->loadMesh(RESOURCE_DIR + "frustum.obj");
 	frustum->init();
 
+	sphere = make_shared<MyShape>();
+	sphere->loadShape("sphere");
+	sphere->init();
 
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
 
 			Object* obj = new Object();
-			if (j % 2 == 0) {
+			float r = rand() / float(RAND_MAX);
+
+			if (r < 0.333) {
 				obj->setShapeType("bunny");
 				obj->setShape(bunny); // bunny
 				obj->setTranslation(glm::vec3(j, obj->getScale()[1] * -0.333099, -i));
 				
 			}
+			//else if (r >= 0.333 && r < 0.666) {
+			//	obj->setShapeType("teapot");
+			//	obj->setShape(teapot); // teapot
+			//	obj->setTranslation(glm::vec3(j, 0, -i));
+			//	
+			//}
+			//else { //greater than or equal to 0.666
+			//	obj->setShapeType("sphere");
+			//	obj->setShape(sphere);
+			//	obj->setTranslation(glm::vec3(j, 0, -i));
+			//}
+
 			else {
 				obj->setShapeType("teapot");
 				obj->setShape(teapot); // teapot
 				obj->setTranslation(glm::vec3(j, 0, -i));
-				
 			}
+
+			//ONLY SPHERES
+			/*obj->setShapeType("sphere");
+			obj->setShape(sphere);
+			obj->setTranslation(glm::vec3(j, 0, -i));*/
 
 			objects.push_back(obj);
 		}
@@ -464,6 +490,8 @@ static void render()
 
 		currObject = objects[i];
 
+		cout << "Shape type: " << currObject->getShapeType() << endl;
+
 		MV->pushMatrix();
 		{
 			MV->translate(currObject->getTranslation());
@@ -477,6 +505,13 @@ static void render()
 				//shear
 				MV->multMatrix(S);
 			}
+			if (currObject->getShapeType() == "sphere") {
+
+				float bounce_up = 1.3 * (1.0 / 2.0 * sin((2 * (M_PI / 1.7) * (t + 0.9))) + 1.0 / 2.0);
+				float squash_and_stretch = -1 * 0.5 * (1.0 / 2.0 * cos((4 * M_PI / 1.7) * (t + 0.9)) + 1.0 / 2.0) + 1;
+				MV->translate(0, bounce_up, 0);
+				MV->scale(squash_and_stretch, 1, squash_and_stretch);
+			}
 			
 
 			prog2->bind();
@@ -487,7 +522,20 @@ static void render()
 			glUniform3f(prog2->getUniform("kd"), currObject->getDiffuse()[0], currObject->getDiffuse()[1], currObject->getDiffuse()[2]);
 			glUniform3f(prog2->getUniform("ks"), 1, 1, 1);
 			glUniform1f(prog2->getUniform("s"), 10);
+
+			//SPHERES AND TEAPOTS AND BUNNIES
+			/*if (currObject->getShapeType() == "sphere") {
+				currObject->getMyShape()->draw(prog2);
+			}
+			else {
+				currObject->getShape()->draw(prog2);
+			}*/
+
+			//ONLY TEAPOTS AND BUNNIES
 			currObject->getShape()->draw(prog2);
+
+			//ONLY SPHERES
+			//currObject->getMyShape()->draw(prog2);
 			prog2->unbind();
 		}
 		MV->popMatrix();
