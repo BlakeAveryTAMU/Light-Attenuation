@@ -349,23 +349,23 @@ static void init()
 				obj->setTranslation(glm::vec3(j, obj->getScale()[1] * -0.333099, -i));
 				
 			}
-			//else if (r >= 0.333 && r < 0.666) {
-			//	obj->setShapeType("teapot");
-			//	obj->setShape(teapot); // teapot
-			//	obj->setTranslation(glm::vec3(j, 0, -i));
-			//	
-			//}
-			//else { //greater than or equal to 0.666
-			//	obj->setShapeType("sphere");
-			//	obj->setShape(sphere);
-			//	obj->setTranslation(glm::vec3(j, 0, -i));
-			//}
-
-			else {
+			else if (r >= 0.333 && r < 0.666) {
 				obj->setShapeType("teapot");
 				obj->setShape(teapot); // teapot
 				obj->setTranslation(glm::vec3(j, 0, -i));
+				
 			}
+			else { //greater than or equal to 0.666
+				obj->setShapeType("sphere");
+				obj->setShape(sphere);
+				obj->setTranslation(glm::vec3(j, 0.5, -i));
+			}
+
+			//else {
+			//	obj->setShapeType("teapot");
+			//	obj->setShape(teapot); // teapot
+			//	obj->setTranslation(glm::vec3(j, 0, -i));
+			//}
 
 			//ONLY SPHERES
 			/*obj->setShapeType("sphere");
@@ -490,7 +490,7 @@ static void render()
 
 		currObject = objects[i];
 
-		cout << "Shape type: " << currObject->getShapeType() << endl;
+		//cout << "Shape type: " << currObject->getShapeType() << endl;
 
 		MV->pushMatrix();
 		{
@@ -524,18 +524,20 @@ static void render()
 			glUniform1f(prog2->getUniform("s"), 10);
 
 			//SPHERES AND TEAPOTS AND BUNNIES
-			/*if (currObject->getShapeType() == "sphere") {
+			if (currObject->getShapeType() == "sphere") {
 				currObject->getMyShape()->draw(prog2);
 			}
 			else {
 				currObject->getShape()->draw(prog2);
-			}*/
+			}
 
 			//ONLY TEAPOTS AND BUNNIES
-			currObject->getShape()->draw(prog2);
+			//currObject->getShape()->draw(prog2);
+			GLSL::checkError(GET_FILE_LINE);
 
 			//ONLY SPHERES
-			//currObject->getMyShape()->draw(prog2);
+			/*currObject->getMyShape()->draw(prog2);
+			GLSL::checkError(GET_FILE_LINE);*/
 			prog2->unbind();
 		}
 		MV->popMatrix();

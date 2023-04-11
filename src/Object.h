@@ -43,7 +43,9 @@ public:
 
 	//OVerload the setShape function e.g void setShape(shared_ptr<MyShape> s)
 	void setShape(std::shared_ptr<MyShape> m) { mShape = m; }
-	std::shared_ptr<MyShape> getMyShape() { return mShape; }
+	std::shared_ptr<MyShape> getMyShape() { 
+		GLSL::checkError(GET_FILE_LINE);
+		return mShape; }
 
 	void setShape(std::shared_ptr<Shape> s) {shape = s;}
 	std::shared_ptr<Shape> getShape() { return shape; }
