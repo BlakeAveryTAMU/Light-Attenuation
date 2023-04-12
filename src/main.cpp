@@ -198,12 +198,19 @@ static void init()
 	surface_of_rev->setShaderNames(RESOURCE_DIR + "surface_vert.glsl", RESOURCE_DIR + "frag.glsl");
 	surface_of_rev->setVerbose(true);
 	surface_of_rev->init();
+	surface_of_rev->addUniform("t");
 	surface_of_rev->addUniform("MV");
 	surface_of_rev->addUniform("MVit");
 	surface_of_rev->addUniform("P");
-	surface_of_rev->addUniform("t");
 	surface_of_rev->addAttribute("aPos");
 	surface_of_rev->addAttribute("aTex");
+	surface_of_rev->addUniform("ka");
+	surface_of_rev->addUniform("ke");
+	surface_of_rev->addUniform("kd");
+	surface_of_rev->addUniform("ks");
+	surface_of_rev->addUniform("s");
+	surface_of_rev->addUniform("lightPositions");
+	surface_of_rev->addUniform("lightDiffuseColors");
 	surface_of_rev->setVerbose(false);
 
 
@@ -334,6 +341,7 @@ static void init()
 
 			Object* obj = new Object();
 			float r = rand() / float(RAND_MAX);
+			//if (r >= 0.75) { r = 0.74; }
 
 			if (r < 0.25) {
 
@@ -367,8 +375,8 @@ static void init()
 				
 				obj->setShapeType("vase");
 				obj->setShape(vase);
-				obj->setScale(glm::vec3(obj->smaller_random_scale_factor, obj->smaller_random_scale_factor, obj->smaller_random_scale_factor));
-				obj->setTranslation(glm::vec3(j, obj->getScale()[1] * 1, -i));
+				obj->setScale(glm::vec3(0.07, 0.07, 0.07));
+				obj->setTranslation(glm::vec3(j, 0, -i));
 			}
 
 
@@ -512,8 +520,11 @@ static void render()
 				MV->translate(0, bounce_up, 0);
 				MV->scale(squash_and_stretch, 1, squash_and_stretch);
 			}
-			
+			if (currObject->getShapeType() == "vase") {
 
+				MV->rotate(M_PI / 2, { 0, 0, 1 });
+			}
+			
 			prog2->bind();
 			glUniformMatrix4fv(prog2->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 			glUniformMatrix4fv(prog2->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
@@ -527,7 +538,19 @@ static void render()
 				currObject->getMyShape()->draw(prog2, "sphere", t);
 			}
 			else if (currObject->getShapeType() == "vase") {
-				currObject->getMyShape()->draw(prog2, "vase", t);
+
+				surface_of_rev->bind();
+				glUniform3fv(surface_of_rev->getUniform("lightPositions"), 10, glm::value_ptr(temp_light_positions[0]));
+				glUniform3fv(surface_of_rev->getUniform("lightDiffuseColors"), 10, glm::value_ptr(light_diffuse_colors[0]));
+				glUniformMatrix4fv(surface_of_rev->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
+				glUniformMatrix4fv(surface_of_rev->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
+				glUniformMatrix4fv(surface_of_rev->getUniform("MVit"), 1, GL_FALSE, glm::value_ptr(transpose(inverse(MV->topMatrix()))));
+				glUniform3f(surface_of_rev->getUniform("ke"), 0, 0, 0);
+				glUniform3f(surface_of_rev->getUniform("kd"), currObject->getDiffuse()[0], currObject->getDiffuse()[1], currObject->getDiffuse()[2]);
+				glUniform3f(surface_of_rev->getUniform("ks"), 1, 1, 1);
+				glUniform1f(surface_of_rev->getUniform("s"), 10);
+				currObject->getMyShape()->draw(surface_of_rev, "vase", t);
+				surface_of_rev->unbind();
 			}
 			else {
 				currObject->getShape()->draw(prog2);
@@ -536,6 +559,7 @@ static void render()
 			GLSL::checkError(GET_FILE_LINE);
 
 			prog2->unbind();
+			
 		}
 		MV->popMatrix();
 	}

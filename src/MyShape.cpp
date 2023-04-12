@@ -178,8 +178,10 @@ void MyShape::draw(std::shared_ptr<Program> prog, std::string type, float t)  {
 	}
 
 	if (type == "vase") {
+		//std::cout << "vase" << std::endl;
 
 		glUniform1f(prog->getUniform("t"), t);
+		
 		glEnableVertexAttribArray(prog->getAttribute("aPos"));
 
 		//glEnableVertexAttribArray(prog->getAttribute("aNor"));
@@ -187,25 +189,25 @@ void MyShape::draw(std::shared_ptr<Program> prog, std::string type, float t)  {
 		//glEnableVertexAttribArray(prog->getAttribute("aTex"));
 
 		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bPos"]);
-
+		
 		glVertexAttribPointer(prog->getAttribute("aPos"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
+		
 		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bNor"]);
-
+		
 		//glVertexAttribPointer(prog->getAttribute("aNor"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bTex"]);
-
+		
 		//glVertexAttribPointer(prog->getAttribute("aTex"), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIDs["bInd"]);
-
+		
 		glDrawElements(GL_TRIANGLES, indCount, GL_UNSIGNED_INT, (void*)0);
-
+		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+		
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+		
 		//glDisableVertexAttribArray(prog->getAttribute("aTex"));
 
 		//glDisableVertexAttribArray(prog->getAttribute("aNor"));

@@ -10,6 +10,7 @@ attribute vec2 aTex;
 
 varying vec3 vNor; // In camera space
 varying vec2 vTex;
+varying vec3 vPos;
 
 void main()
 {
@@ -25,6 +26,7 @@ void main()
 
 	gl_Position = P * (MV * vec4(position, 1));
 	
+	vPos = position;
 	vNor = vec3(MVit * vec4(normal, 0.0)); // Assuming MV contains only translations and rotations
 	vTex = aTex;
 
