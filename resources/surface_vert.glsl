@@ -5,11 +5,9 @@ uniform mat4 MV;
 uniform mat4 MVit;
 uniform float t;
 attribute vec4 aPos; // In object space
-attribute vec3 aNor; // In object space
-attribute vec2 aTex;
+
 
 varying vec3 vNor; // In camera space
-varying vec2 vTex;
 varying vec3 vPos;
 
 void main()
@@ -26,9 +24,9 @@ void main()
 
 	gl_Position = P * (MV * vec4(position, 1));
 	
-	vPos = position;
-	vNor = vec3(MVit * vec4(normal, 0.0)); // Assuming MV contains only translations and rotations
-	vTex = aTex;
+	vPos = vec3(MV * vec4(position, 1.0));
+	vNor = -1 * normalize(vec3(MVit * vec4(normal, 0.0))); // Assuming MV contains only translations and rotations
+
 
 
 }

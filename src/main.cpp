@@ -203,7 +203,6 @@ static void init()
 	surface_of_rev->addUniform("MVit");
 	surface_of_rev->addUniform("P");
 	surface_of_rev->addAttribute("aPos");
-	surface_of_rev->addAttribute("aTex");
 	surface_of_rev->addUniform("ka");
 	surface_of_rev->addUniform("ke");
 	surface_of_rev->addUniform("kd");
