@@ -41,12 +41,14 @@ shared_ptr<Program> prog;
 shared_ptr<Program> prog2;
 shared_ptr<Program> prog3;
 shared_ptr<Program> prog4;
+shared_ptr<Program> surface_of_rev;
 shared_ptr<Shape> bunny;
 shared_ptr<Shape> teapot;
 shared_ptr<Shape> plane;
 shared_ptr<Shape> sun;
 shared_ptr<Shape> frustum;
 shared_ptr<MyShape> sphere;
+shared_ptr<MyShape> vase;
 
 float minYTeapot;
 float minYBunny;
@@ -192,6 +194,19 @@ static void init()
 	prog2->addUniform("MVit");
 	programs.push_back(prog2);
 
+	surface_of_rev = make_shared<Program>();
+	surface_of_rev->setShaderNames(RESOURCE_DIR + "surface_vert.glsl", RESOURCE_DIR + "frag.glsl");
+	surface_of_rev->setVerbose(true);
+	surface_of_rev->init();
+	surface_of_rev->addUniform("MV");
+	surface_of_rev->addUniform("MVit");
+	surface_of_rev->addUniform("P");
+	surface_of_rev->addUniform("t");
+	surface_of_rev->addAttribute("aPos");
+	surface_of_rev->addAttribute("aTex");
+	surface_of_rev->setVerbose(false);
+
+
 	srand((unsigned int)time(NULL));
 
 	Material m1;
@@ -310,25 +325,32 @@ static void init()
 	sphere->loadShape("sphere");
 	sphere->init();
 
+	vase = make_shared<MyShape>();
+	vase->loadShape("vase");
+	vase->init();
+
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
 
 			Object* obj = new Object();
 			float r = rand() / float(RAND_MAX);
 
-			if (r < 0.333) {
+			if (r < 0.25) {
+
 				obj->setShapeType("bunny");
 				obj->setShape(bunny); // bunny
 				obj->setTranslation(glm::vec3(j, obj->getScale()[1] * -0.333099, -i));
 				
 			}
-			else if (r >= 0.333 && r < 0.666) {
+			else if (r >= 0.25 && r < 0.5) {
+
 				obj->setShapeType("teapot");
 				obj->setShape(teapot); // teapot
 				obj->setTranslation(glm::vec3(j, 0, -i));
 				
 			}
-			else { //greater than or equal to 0.666
+			else if (r >= 0.5 && r < 0.75) {
+
 				obj->setShapeType("sphere");
 				obj->setShape(sphere);
 				float r_smaller = obj->smaller_random_scale_factor;
@@ -340,6 +362,13 @@ static void init()
 				}
 				obj->setScale(glm::vec3(r_smaller, r_smaller, r_smaller));
 				obj->setTranslation(glm::vec3(j,obj->getScale()[1] * 1, -i));
+			}
+			else {
+				
+				obj->setShapeType("vase");
+				obj->setShape(vase);
+				obj->setScale(glm::vec3(obj->smaller_random_scale_factor, obj->smaller_random_scale_factor, obj->smaller_random_scale_factor));
+				obj->setTranslation(glm::vec3(j, obj->getScale()[1] * 1, -i));
 			}
 
 
@@ -495,7 +524,10 @@ static void render()
 			glUniform1f(prog2->getUniform("s"), 10);
 
 			if (currObject->getShapeType() == "sphere") {
-				currObject->getMyShape()->draw(prog2);
+				currObject->getMyShape()->draw(prog2, "sphere", t);
+			}
+			else if (currObject->getShapeType() == "vase") {
+				currObject->getMyShape()->draw(prog2, "vase", t);
 			}
 			else {
 				currObject->getShape()->draw(prog2);

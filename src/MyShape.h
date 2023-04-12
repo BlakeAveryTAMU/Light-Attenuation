@@ -30,7 +30,7 @@ public:
 	MyShape();
 	void loadShape(std::string type);
 	void init();
-	void draw( std::shared_ptr<Program> prog);
+	void draw( std::shared_ptr<Program> prog, std::string type, float t);
 
 };
 

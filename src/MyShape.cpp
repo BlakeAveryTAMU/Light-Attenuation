@@ -13,6 +13,7 @@ MyShape::MyShape() : indCount(0) {}
 
 void MyShape::loadShape(std::string type) {
 
+
 	float num_grid_points_x = 50;
 	float num_grid_points_y = 50;
 
@@ -28,33 +29,71 @@ void MyShape::loadShape(std::string type) {
 	float theta = 0.0;
 	float phi = 0.0;
 
-	for (int i = 0; i < num_grid_points_y; i++) { // rows
+	float x = 0.0;
 
-		texture_x = 0.0;
-		theta = 0.0;
+	if (type == "sphere") {
 
-		for (int j = 0; j < num_grid_points_x; j++) { // columns
+		for (int i = 0; i < num_grid_points_y; i++) { // rows
+
+			texture_x = 0.0;
+			theta = 0.0;
+
+			for (int j = 0; j < num_grid_points_x; j++) { // columns
 
 
-			posBuf.push_back(sin(theta) * sin(phi)); // Sphere
-			posBuf.push_back(cos(theta));
-			posBuf.push_back(sin(theta) * cos(phi));
+				posBuf.push_back(sin(theta) * sin(phi)); // Sphere
+				posBuf.push_back(cos(theta));
+				posBuf.push_back(sin(theta) * cos(phi));
 
-			norBuf.push_back(sin(theta) * sin(phi)); // Sphere
-			norBuf.push_back(cos(theta));
-			norBuf.push_back(sin(theta) * cos(phi));
+				norBuf.push_back(sin(theta) * sin(phi)); // Sphere
+				norBuf.push_back(cos(theta));
+				norBuf.push_back(sin(theta) * cos(phi));
 
-			texBuf.push_back(texture_x);
-			texBuf.push_back(texture_y);
+				texBuf.push_back(texture_x);
+				texBuf.push_back(texture_y);
 
-			texture_x = texture_x + 1 / (num_grid_points_x - 1);
+				texture_x = texture_x + 1 / (num_grid_points_x - 1);
 
-			theta = theta + M_PI / (num_grid_points_x - 1);
+				theta = theta + M_PI / (num_grid_points_x - 1);
 
+			}
+			phi = phi + 2 * M_PI / (num_grid_points_y - 1);
+			texture_y = texture_y + 1 / (num_grid_points_y - 1);
 		}
-		phi = phi + 2 * M_PI / (num_grid_points_y - 1);
-		texture_y = texture_y + 1 / (num_grid_points_y - 1);
 	}
+
+	if (type == "vase") {
+
+		for (int i = 0; i < num_grid_points_y; i++) { // rows
+
+			texture_x = 0.0;
+			x = 0.0;
+
+			for (int j = 0; j < num_grid_points_x; j++) { // columns
+
+
+				posBuf.push_back(x); // Sphere
+				posBuf.push_back(theta);
+				posBuf.push_back(0.0f);
+
+				norBuf.push_back(0.0f); // Sphere
+				norBuf.push_back(0.0f);
+				norBuf.push_back(0.0f);
+
+				texBuf.push_back(texture_x);
+				texBuf.push_back(texture_y);
+
+				texture_x = texture_x + 1.0 / (num_grid_points_x - 1);
+
+				x = x + 10.0 / (num_grid_points_x - 1);
+
+			}
+			theta = theta + 2 * M_PI / (num_grid_points_x - 1);
+			texture_y = texture_y + 1 / (num_grid_points_y - 1);
+		}
+	}
+
+	
 
 	int count = 0;
 	for (int i = 0; i < num_grid_points_y - 1; i++) {
@@ -100,40 +139,80 @@ void MyShape::init() {
 	GLSL::checkError(GET_FILE_LINE);
 }
 
-void MyShape::draw(std::shared_ptr<Program> prog)  {
+void MyShape::draw(std::shared_ptr<Program> prog, std::string type, float t)  {
 
+	if (type == "sphere") {
 
-	glEnableVertexAttribArray(prog->getAttribute("aPos"));
+		glEnableVertexAttribArray(prog->getAttribute("aPos"));
+
+		glEnableVertexAttribArray(prog->getAttribute("aNor"));
+
+		//glEnableVertexAttribArray(prog->getAttribute("aTex"));
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bPos"]);
+
+		glVertexAttribPointer(prog->getAttribute("aPos"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bNor"]);
+
+		glVertexAttribPointer(prog->getAttribute("aNor"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bTex"]);
+
+		//glVertexAttribPointer(prog->getAttribute("aTex"), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIDs["bInd"]);
+
+		glDrawElements(GL_TRIANGLES, indCount, GL_UNSIGNED_INT, (void*)0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		//glDisableVertexAttribArray(prog->getAttribute("aTex"));
+
+		glDisableVertexAttribArray(prog->getAttribute("aNor"));
+
+		glDisableVertexAttribArray(prog->getAttribute("aPos"));
+		GLSL::checkError(GET_FILE_LINE);
+	}
+
+	if (type == "vase") {
+
+		glUniform1f(prog->getUniform("t"), t);
+		glEnableVertexAttribArray(prog->getAttribute("aPos"));
+
+		//glEnableVertexAttribArray(prog->getAttribute("aNor"));
+
+		//glEnableVertexAttribArray(prog->getAttribute("aTex"));
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bPos"]);
+
+		glVertexAttribPointer(prog->getAttribute("aPos"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bNor"]);
+
+		//glVertexAttribPointer(prog->getAttribute("aNor"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bTex"]);
+
+		//glVertexAttribPointer(prog->getAttribute("aTex"), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIDs["bInd"]);
+
+		glDrawElements(GL_TRIANGLES, indCount, GL_UNSIGNED_INT, (void*)0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		//glDisableVertexAttribArray(prog->getAttribute("aTex"));
+
+		//glDisableVertexAttribArray(prog->getAttribute("aNor"));
+
+		glDisableVertexAttribArray(prog->getAttribute("aPos"));
+		GLSL::checkError(GET_FILE_LINE);
+	}
 	
-	glEnableVertexAttribArray(prog->getAttribute("aNor"));
-	
-	//glEnableVertexAttribArray(prog->getAttribute("aTex"));
-	
-	glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bPos"]);
-	
-	glVertexAttribPointer(prog->getAttribute("aPos"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bNor"]);
-	
-	glVertexAttribPointer(prog->getAttribute("aNor"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bTex"]);
-	
-	//glVertexAttribPointer(prog->getAttribute("aTex"), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIDs["bInd"]);
-	
-	glDrawElements(GL_TRIANGLES, indCount, GL_UNSIGNED_INT, (void *)0);
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
-	//glDisableVertexAttribArray(prog->getAttribute("aTex"));
-	
-	glDisableVertexAttribArray(prog->getAttribute("aNor"));
-	
-	glDisableVertexAttribArray(prog->getAttribute("aPos"));
-	GLSL::checkError(GET_FILE_LINE);
 }
 

@@ -1,4 +1,3 @@
-change ka to ke
-make ke zero
-hard code specular color to (1,1,1) with shiny = 10
-test
+create new shader
+create new prog in init()
+add check for "vase" in MyShape
