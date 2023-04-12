@@ -102,37 +102,37 @@ void MyShape::init() {
 
 void MyShape::draw(std::shared_ptr<Program> prog)  {
 
-	GLSL::checkError(GET_FILE_LINE);
+
 	glEnableVertexAttribArray(prog->getAttribute("aPos"));
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glEnableVertexAttribArray(prog->getAttribute("aNor"));
-	GLSL::checkError(GET_FILE_LINE);
+	
 	//glEnableVertexAttribArray(prog->getAttribute("aTex"));
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bPos"]);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glVertexAttribPointer(prog->getAttribute("aPos"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bNor"]);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glVertexAttribPointer(prog->getAttribute("aNor"), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, bufIDs["bTex"]);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	//glVertexAttribPointer(prog->getAttribute("aTex"), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufIDs["bInd"]);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glDrawElements(GL_TRIANGLES, indCount, GL_UNSIGNED_INT, (void *)0);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	GLSL::checkError(GET_FILE_LINE);
+	
 	//glDisableVertexAttribArray(prog->getAttribute("aTex"));
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glDisableVertexAttribArray(prog->getAttribute("aNor"));
-	GLSL::checkError(GET_FILE_LINE);
+	
 	glDisableVertexAttribArray(prog->getAttribute("aPos"));
 	GLSL::checkError(GET_FILE_LINE);
 }

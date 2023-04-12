@@ -27,7 +27,8 @@ private:
 
 public:
 
-	float random_scale_factor = (float)(rand()) / (float)(RAND_MAX) / 2 + 0.1f;
+	float random_scale_factor = (float)(rand()) / (float)(RAND_MAX) / 2.0 + 0.1f;
+	float smaller_random_scale_factor = (float)(rand()) / (float)(RAND_MAX) / 2.0;
 
 	Object() {
 		shape_type = "";

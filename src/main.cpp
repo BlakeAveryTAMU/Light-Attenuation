@@ -125,35 +125,8 @@ static void cursor_position_callback(GLFWwindow* window, double xmouse, double y
 
 static void char_callback(GLFWwindow *window, unsigned int key)
 {
-	switch (key) {
 
-		/*case 'w':
-			freeCam->keyPressed(key);
-			break;
-		case 'a':
-			freeCam->keyPressed(key);
-			break;
-		case 's':
-			freeCam->keyPressed(key);
-			break;
-		case 'd':
-			freeCam->keyPressed(key);
-			break;
-		case 'z':
-			freeCam->updateFOV(key);
-			break;
-		case 'Z':
-			freeCam->updateFOV(key);
-			break;
-		case 't':
-			activated += 1;
-			break;*/
 
-	case 'l':
-		currLight = lights[++lightIndex];
-		break;
-	
-	}
 
 }
 
@@ -358,19 +331,17 @@ static void init()
 			else { //greater than or equal to 0.666
 				obj->setShapeType("sphere");
 				obj->setShape(sphere);
-				obj->setTranslation(glm::vec3(j, 0.5, -i));
+				float r_smaller = obj->smaller_random_scale_factor;
+				if (r_smaller > 0.2){
+					r_smaller = 0.2;
+				}
+				else if (r_smaller < 0.1) {
+					r_smaller = 0.1;
+				}
+				obj->setScale(glm::vec3(r_smaller, r_smaller, r_smaller));
+				obj->setTranslation(glm::vec3(j,obj->getScale()[1] * 1, -i));
 			}
 
-			//else {
-			//	obj->setShapeType("teapot");
-			//	obj->setShape(teapot); // teapot
-			//	obj->setTranslation(glm::vec3(j, 0, -i));
-			//}
-
-			//ONLY SPHERES
-			/*obj->setShapeType("sphere");
-			obj->setShape(sphere);
-			obj->setTranslation(glm::vec3(j, 0, -i));*/
 
 			objects.push_back(obj);
 		}
@@ -404,7 +375,6 @@ static void render()
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	camera->setAspect((float)width / (float)height);
-	//reeCam->setAspect((float)width / (float)height);
 
 	float aspect_ratio = (float)width / (float)height;
 
@@ -428,7 +398,6 @@ static void render()
 	glm::vec3 temp_light_positions[10];
 	for (int i = 0; i < 10; i++) {
 
-		//glm::vec3 temp = MV->topMatrix() * glm::vec4(currLight.getPosition(), 1); // change to lights[currLight].getPosition ? 
 		temp_light_positions[i] = glm::vec3(MV->topMatrix() * glm::vec4(light_positions[i], 1));
 
 	}
@@ -484,6 +453,9 @@ static void render()
 
 	}
 	MV->popMatrix();
+
+	float bounce_up = 1.3 * (1.0 / 2.0 * sin((2 * (M_PI / 1.7) * (t / 2.0 + 0.9))) + 1.0 / 2.0);
+	float squash_and_stretch = -1 * 0.5 * (1.0 / 2.0 * cos((4 * M_PI / 1.7) * (t / 2.0 + 0.9)) + 1.0 / 2.0) + 1;
 	
 	// Draw Objects ***************************************************************************************************************
 	for (int i = 0; i < objects.size(); i++) {
@@ -507,8 +479,7 @@ static void render()
 			}
 			if (currObject->getShapeType() == "sphere") {
 
-				float bounce_up = 1.3 * (1.0 / 2.0 * sin((2 * (M_PI / 1.7) * (t + 0.9))) + 1.0 / 2.0);
-				float squash_and_stretch = -1 * 0.5 * (1.0 / 2.0 * cos((4 * M_PI / 1.7) * (t + 0.9)) + 1.0 / 2.0) + 1;
+
 				MV->translate(0, bounce_up, 0);
 				MV->scale(squash_and_stretch, 1, squash_and_stretch);
 			}
@@ -523,7 +494,6 @@ static void render()
 			glUniform3f(prog2->getUniform("ks"), 1, 1, 1);
 			glUniform1f(prog2->getUniform("s"), 10);
 
-			//SPHERES AND TEAPOTS AND BUNNIES
 			if (currObject->getShapeType() == "sphere") {
 				currObject->getMyShape()->draw(prog2);
 			}
@@ -531,13 +501,8 @@ static void render()
 				currObject->getShape()->draw(prog2);
 			}
 
-			//ONLY TEAPOTS AND BUNNIES
-			//currObject->getShape()->draw(prog2);
 			GLSL::checkError(GET_FILE_LINE);
 
-			//ONLY SPHERES
-			/*currObject->getMyShape()->draw(prog2);
-			GLSL::checkError(GET_FILE_LINE);*/
 			prog2->unbind();
 		}
 		MV->popMatrix();
@@ -562,8 +527,7 @@ static void render()
 
 int main(int argc, char **argv)
 {
-	/*cout << minYCube << endl;
-	cout << minYBunny << endl;*/
+
 	if(argc < 2) {
 		cout << "Usage: A3 RESOURCE_DIR" << endl;
 		return 0;
