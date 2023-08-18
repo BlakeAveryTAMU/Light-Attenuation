@@ -1,5 +1,7 @@
 # Light Attenuation
 
+## Demo
+
 https://github.com/BlakeAveryTAMU/Deferred-Rendering/assets/108947178/0eb6f73d-2806-45e0-b689-3d6cb1a89ed2
 
 ## Description
